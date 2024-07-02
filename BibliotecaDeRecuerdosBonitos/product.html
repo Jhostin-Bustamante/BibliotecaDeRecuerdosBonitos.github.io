@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Producto</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .product-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            align-items: start;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image img, .product-image video {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-details {
+            text-align: left;
+        }
+
+        .product-description {
+            margin-top: 0;
+            color: #555;
+        }
+
+        .audio-controls {
+            margin-top: 10px;
+        }
+
+        .audio-controls button {
+            margin-right: 10px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #ff7e67;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .audio-controls button:hover {
+            background-color: #ff5630;
+        }
+    </style>
+</head>
+<body>
+    <div class="container product-container">
+        <div class="product-image">
+            <img id="product-image" src="images/a.png.jpg" alt="Producto">
+            <video id="product-video" controls style="display: none;"></video>
+        </div>
+        <div class="product-details">
+            <h2 id="product-title">Detalles del Producto</h2>
+            <div id="product-content">
+                <p class="product-description">Descripción del Producto. Esta es una descripción larga que muestra cómo se ve la descripción en la página y cómo se muestra el contenido del producto.</p>
+                <div class="audio-controls">
+                    <button id="play-btn" onclick="playAudio()">Reproducir Audio</button>
+                    <button id="pause-btn" onclick="pauseAudio()" style="display: none;">Pausar Audio</button>
+                </div>
+                <audio id="product-audio" src=""></audio>
+                <p><a href="gallery.html">Volver a la galería</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let audioPlayer;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const productId = params.get('id');
+
+            // Información ficticia de productos con rutas locales
+            const products = {
+                '1': {
+                    title: 'Recuerdo 1',
+                    description: '¿Recuerdas esta fecha?🥹, en aquel entonces todo parecía mas fácil, todo era risas e ilusiones, y fueron momentos bonitos, que si bien después tendríamos percances y dificultades, al menos forjamos algo bonito que después en el futuro nos aria entender que futuro queríamos para los dos y cuales serian las decisiones y emociones que queríamos implementar en nuestras vidas😙.',
+                    image: 'images/a.png.jpg', // Ruta local de la imagen
+                    video: '', // Deja vacío si no hay video
+                    audio: 'Audio/a1.dat' // URL del audio
+                },
+                '2': {
+                    title: 'Recuerdo 2',
+                    description: 'Jsjsjsjsjs como olvidar esa noche, fue muy bonito compartir tantas experiencias lindas, esa noche me la pase bien al ir a comer ese waffle🧇, te veías muy bonita, o bueno, para mi aunque estés estado toda despeinada, sin bañarte, llena de lodo, yo te seguiré viendo tan hermosa como siempre😇, porque eres muy linda, me encanto haber tocado a tu lado, me encanta estar haciendo musica a tu lado, porque me das esa tranquilidad que nadie mas me puede dar, porque al igual que en otras presentaciones, ese día solo te imaginaba a ti y a mi, nada mas sintiéndome feliz porque podia verte, porque tenia la oportunidad de estar contigo😋.',
+                    image: 'images/b.png.jpg', // Ruta local de la imagen
+                    video: '', // Deja vacío si no hay video
+                    audio: 'Audio/a2.dat' // URL del audio
+                },
+                '3': {
+                    title: 'Recuerdo 3',
+                    description: 'De todos los recuerdos, ¿Sabes cual es mi favorito?, es el de tu linda sonrisa, jsjsjs osea todos nuestros recuerdos, porque me encanta, me fascina admirar esa preciosa sonrisita😇, ¿recuerdas el día que fue tu cumpleaños?, cuando pensaste que te haríamos nada, yo creo que ha sido uno de los recuerdos que mas he tenido presente, porque ese día te pude ver super feliz, casi llorando je je je, y sobre todo, te pude dar un abrazo y tener una excusa para pasar el rato a tu laso, porque cualquier excusa era magnifica si te podia ver, porque te extrañaba, y me ponía triste tenerte tan cerca pero solo como amiga, pero, ese fue un lindo recuerdo, el poder tenerte en mis brazos y verte feliz, y poderle afirmar a mi corazón que tu eras la persona a la que quería amar🥰💖.',
+                    image: 'images/c.png.jpg', // Ruta local de la imagen
+                    video: '', // Deja vacío si no hay video
+                    audio: 'Audio/a3.dat' // URL del audio
+                },
+                '4': {
+                    title: 'Recuerdo 4',
+                    description: 'De todas las personas que han pasado por mi vida, quien diría que tu serias la que me haga mirar al mundo de otra manera😊, la que me sacaría de mi terco juicio, jajaja la que me haría ver todo de color rosa😜, me alegra tenerte conmigo, me alegra que aunque haya tomado su tiempo, me aceptaras como tu novio😍, no sabes cuan enamorado estoy, ¿Puedo ser tu novio?🥺.',
+                    image: '', // Ruta local de la imagen
+                    video: 'Video/v1.mp4', // Deja vacío si no hay video
+                    audio: 'Audio/a4.dat' // URL del audio
+                },
+                '5': {
+                    title: 'Recuerdo 5',
+                    description: '¿Podemos volvernos a abrazar con esa emoción?, con esa enorme ilusión de estar juntos, aunque aun no éramos novios😔, pero mi corazón siempre te perteneció, siempre te fue fiel a ti, siempre estuvo y estará hecho para ti mi niña bonita🥺, jsjsjs yo sentía adrenalina por saber si me querías, me emocionaba y me preocupaba ser el único enamorado entre los dos😋, ¿Puedo tratar de volverte a enamorar?👉👈.',
+                    image: 'images/d.png.jpg', // Ruta local de la imagen
+                    video: '', // Deja vacío si no hay video
+                    audio: 'Audio/a5.dat' // URL del audio
+                },
+                '6': {
+                    title: 'Recuerdo 6',
+                    description: 'Obviamente, como voy a olvidar este día, como voy a olvidar cuando se te ocurrió agarrarme como si fuera objetivo en carnaval😅, cuando a la niña se le ocurrió mojarme y dejarme todo empapado, jsjsjsjs ¿recuerdas todo eso mi amor?😋, ¿Puedo arrastrarte por todo el suelo para mojarte?😁, digo, nomas si se puede, igual con o sin permiso lo voy a hacer, asique ni modo mija, váyase con cuidado, que en cualquier momento pongo en marcha mi plan, jsjsjs pero todo va a ser con amor, shi?👉👈. TE AMOOOOOOOOOOOOOOOOOOOOOOOOOOOO😙😙, muacckkk💓💓💓.',
+                    image: '', // Ruta local de la imagen
+                    video: 'Video/v3.mp4', // Deja vacío si no hay video
+                    audio: 'Audio/a6.dat' // URL del audio
+                },
+                '7': {
+                    title: 'Recuerdo 7',
+                    description: 'Amor mío, no sé si alguna vez podré expresar completamente lo que siento por ti, pero pues lo intentare. Cada vez que te miro, veo en ti algo tan especial que hace que el mundo sea un lugar mejor. Tus ojos son como dos gemas hermosas, algo precioso que muestra bondad, alegría, y muchos otros sentimientos complejos, y también tus palabras son melodías que llenan mi corazón de alegría😇. Eres la razón por la que sonrío al despertar y el motivo de mis suspiros antes de dormir. Gracias por ser la persona increíble que eres y por compartir tu vida conmigo, por permitirme estar a tu lado mi vida. Te amo más de lo que las estrellas brillan en el cielo, te amo mas que a nadie, mas que cualquier otra cosa en este mundo💘.',
+                    image: 'images/e.png.jpg', // Ruta local de la imagen
+                    video: '', // Deja vacío si no hay video
+                    audio: 'Music/es que yo te quiero a ti.mp3' // URL del audio
+                },
+                '8': {
+                    title: 'Recuerdo 8',
+                    description: 'No sé si alguna vez te he dicho cuánto me inspiras cada día. Eres la luz que ilumina mi mundo y hace que todo tenga sentido, la persona que me da fuerzas cuando siento que no puedo más. Adoro cómo afrontas muchas cosas, como actúas frente a un problema, y cómo siempre encuentras una manera de hacerme sentir amado. Eres la niña más bonita, por dentro y por fuera, y me haces feliz de una forma que nunca creí posible. Gracias por todo lo que eres. Te amo mi piojito loco😋',
+                    image: 'images/f.png.jpg', // Ruta local de la imagen
+                    video: '', // Deja vacío si no hay video
+                    audio: 'Music/pero te conoci.mp3' // URL del audio
+                },
+                '9': {
+                    title: 'Recuerdo 9',
+                    description: 'Hola cariñito mio, solo quería decirte lo mucho que te aprecio. Tu risa, tus abrazos, y hasta la forma en que me miras hacen que mi mundo sea un lugar mejor. Me encanta cómo haces que las cosas simples se sientan extraordinarias, y cómo tu cariño me hace sentir tan feliz y amado. Gracias por ser mi compañera, mi confidente, mi amiga, y la persona que siempre está a mi lado. Eres verdaderamente encantadora, y me haces sentir el hombre más afortunado del mundo. Te quiero con todo mi amor, eres lo mejor que me ha pasado en la vida, eres mi mas grande y único orgullo💓💓.',
+                    image: 'images/g.png.jpg', // Ruta local de la imagen
+                    video: '', // Deja vacío si no hay video
+                    audio: 'Music/limon y sal.mp3' // URL del audio
+                },
+            };
+
+            const product = products[productId];
+            if (product) {
+                document.getElementById('product-title').textContent = product.title;
+                document.getElementById('product-content').querySelector('.product-description').textContent = product.description;
+
+                if (product.image) {
+                    // Muestra la imagen y oculta el video si hay imagen
+                    document.getElementById('product-image').src = product.image;
+                    document.getElementById('product-image').style.display = 'block';
+                    document.getElementById('product-video').style.display = 'none';
+                } else if (product.video) {
+                    // Muestra el video y oculta la imagen si hay video
+                    document.getElementById('product-video').src = product.video;
+                    document.getElementById('product-video').style.display = 'block';
+                    document.getElementById('product-image').style.display = 'none';
+                }
+
+                document.getElementById('product-audio').src = product.audio;
+                audioPlayer = document.getElementById('product-audio');
+            } else {
+                document.getElementById('product-title').textContent = 'Producto no encontrado';
+                document.getElementById('product-content').innerHTML = '<p>El producto seleccionado no está disponible.</p>';
+            }
+        });
+
+        function playAudio() {
+            if (audioPlayer) {
+                audioPlayer.play();
+                document.getElementById('play-btn').style.display = 'none';
+                document.getElementById('pause-btn').style.display = 'inline-block';
+            }
+        }
+
+        function pauseAudio() {
+            if (audioPlayer) {
+                audioPlayer.pause();
+                document.getElementById('play-btn').style.display = 'inline-block';
+                document.getElementById('pause-btn').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
